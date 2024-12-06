@@ -48,7 +48,8 @@ class GiantBombAPI
         # init all vars
         $name = "";
         $release_date = "";
-        $first_release_date = "";
+        $average_score = "";
+        $detail = [];
 
         if (!$html) {
             $json_output['error'] = "Page could not be loaded!";
@@ -65,36 +66,121 @@ class GiantBombAPI
             /* REALEASE */
             foreach ($html->find('p.wiki-descriptor') as $element) {
                 $last_release_date = trim(substr($element->plaintext, strpos($element->plaintext, 'Released') + strlen('Released')));
-                $release_date = substr($last_release_date, 0, 18);
+                $release_date = trim(substr($last_release_date, 0, 18));
             }
 
-            /* FIRST_REALEASE */
-            $j = 0;
-            foreach ($html->find('div.wiki-details table tbody tr td div.wiki-item-display a') as $element) {
-                var_dump($element->plaintext);
-                var_dump($element->href);
-
-                /* NAME */
-                if ($j == 0) {
-//                    var_dump($element->plaintext);
-//                    var_dump($element->href);
-                }
-                /* PLATEFORME */
-                if ($j == 1) {
-//                    var_dump($element->plaintext);
-//                    var_dump($element->href);
-                }
-                $j++;
+            /* AVERAGHE */
+            foreach ($html->find('span.average-score') as $element) {
+                $average_score = trim(str_replace('stars', '', $element->plaintext));
             }
 
-            /* FIRST_REALEASE */
-            $j = 0;
-            foreach ($html->find('div.wiki-details table tbody tr td div.wiki-item-display span') as $element) {
-                if ($j == 1) {
-                    $first_release_date = $element->plaintext;
+            /* DETAILS */
+            foreach ($html->find('div.wiki-details table tbody tr') as $element) {
+                if (!empty($element->nodes[1])){
+//                    var_dump(strtolower(trim($element->nodes[1]->plaintext)));
+
+                    /* Name*/
+                    if (strtolower(trim($element->nodes[1]->plaintext)) == 'name'){
+                        $elementName = $element->find('td', 0);
+                        $detail["name"] = [
+                            'name' => trim($elementName->find('a', 0)->plaintext),
+                            'url' => trim($elementName->find('a', 0)->href)
+                        ];
+                    }
+
+                    /* FIRST_REALEASE */
+                    if (strtolower(trim($element->nodes[1]->plaintext)) == 'first release date'){
+                        $elementFirstReleaseDate = $element->find('td', 0);
+                        $detail["firs_release_date"] = trim($elementFirstReleaseDate->find('span', 0)->plaintext);
+                    }
+
+                    /* PLATEFORM */
+                    if (strtolower(trim($element->nodes[1]->plaintext)) == 'platform'){
+                        $elementSub = $element->find('td a');
+                        foreach ($elementSub as $oneElement) {
+                            $elementName = trim($oneElement->plaintext);
+                            $elementUrl = trim($oneElement->href);
+                            $detail['platform'][] = [
+                                'name' => $elementName,
+                                'url' => $elementUrl
+                            ];
+                        };
+                    }
+
+                    /* developer */
+                    if (strtolower(trim($element->nodes[1]->plaintext)) == 'developer'){
+                        $elementSub = $element->find('td a');
+                        foreach ($elementSub as $oneElement) {
+                            $elementName = trim($oneElement->plaintext);
+                            $elementUrl = trim($oneElement->href);
+                            $detail['developer'][] = [
+                                'name' => $elementName,
+                                'url' => $elementUrl
+                            ];
+                        };
+                    }
+
+                    /* publisher */
+                    if (strtolower(trim($element->nodes[1]->plaintext)) == 'publisher'){
+                        $elementSub = $element->find('td a');
+                        foreach ($elementSub as $oneElement) {
+                            $elementName = trim($oneElement->plaintext);
+                            $elementUrl = trim($oneElement->href);
+                            $detail['developer'][] = [
+                                'name' => $elementName,
+                                'url' => $elementUrl
+                            ];
+                        };
+                    }
+
+                    /* genre */
+                    if (strtolower(trim($element->nodes[1]->plaintext)) == 'genre'){
+                        $elementSub = $element->find('td a');
+                        foreach ($elementSub as $oneElement) {
+                            $elementName = trim($oneElement->plaintext);
+                            $elementUrl = trim($oneElement->href);
+                            $detail['genre'][] = [
+                                'name' => $elementName,
+                                'url' => $elementUrl
+                            ];
+                        };
+                    }
+
+                    /* theme */
+                    if (strtolower(trim($element->nodes[1]->plaintext)) == 'theme'){
+                        $elementSub = $element->find('td a');
+                        foreach ($elementSub as $oneElement) {
+                            $elementName = trim($oneElement->plaintext);
+                            $elementUrl = trim($oneElement->href);
+                            $detail['theme'][] = [
+                                'name' => $elementName,
+                                'url' => $elementUrl
+                            ];
+                        };
+                    }
+
+                    /* franchises */
+                    if (strtolower(trim($element->nodes[1]->plaintext)) == 'franchises'){
+                        $elementSub = $element->find('td a');
+                        foreach ($elementSub as $oneElement) {
+                            $elementName = trim($oneElement->plaintext);
+                            $elementUrl = trim($oneElement->href);
+                            $detail['franchises'][] = [
+                                'name' => $elementName,
+                                'url' => $elementUrl
+                            ];
+                        };
+                    }
+
+
                 }
-                $j++;
+
             }
+
+
+
+
+
 
             # Prevent memory leak
             $html->clear();
@@ -103,12 +189,13 @@ class GiantBombAPI
             # Fill-in the array
             $json_output['name'] = $name;
             $json_output['release_date'] = $release_date;
-            $json_output['first_release_date'] = $first_release_date;
+            $json_output['average_score'] = $average_score;
+            $json_output['detail'] = $detail;
         }
 
 
         # Return JSON format
-//        header('Content-Type: application/json');
+        header('Content-Type: application/json');
         return json_encode($json_output);
     }
 }
