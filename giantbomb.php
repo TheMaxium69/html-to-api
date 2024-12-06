@@ -7,7 +7,7 @@ class GiantBombAPI
     private $response_body = "";
     private $baseUrl = "https://www.giantbomb.com/";
 
-    public function getGiantBombPage($game_name, $gui)
+    public function getGiantBombPage($game_name, $guid)
     {
         $returnValue = "";
 
@@ -20,7 +20,7 @@ class GiantBombAPI
 
         /* URL */
         $url = 'https://www.giantbomb.com/super-mario-galaxy/3030-16094/'; /* FOR TEST */
-        $url = $this->baseUrl . $game_name . "/" . $gui;
+        $url = $this->baseUrl . $game_name . "/" . $guid;
 
         /* GET PAGE WEB */
         $ch = curl_init();
@@ -201,9 +201,9 @@ class GiantBombAPI
 }
 
 
-if (isset($_GET['game_title']) && isset($_GET['gui'])) {
+if (isset($_GET['game_title']) && isset($_GET['guid'])) {
     $giantbomb_api = new GiantBombAPI();
-    $giantbomb_api->getGiantBombPage($_GET['game_title'], $_GET['gui']);
+    $giantbomb_api->getGiantBombPage($_GET['game_title'], $_GET['guid']);
     echo $giantbomb_api->getGiantBombScores();
 } else {
     echo json_encode(array("error" => "Game title is empty"));
