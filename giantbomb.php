@@ -73,9 +73,16 @@ class GiantBombAPI
             foreach ($html->find('div.wiki-details table tbody tr td div.wiki-item-display a') as $element) {
                 var_dump($element->plaintext);
                 var_dump($element->href);
+
+                /* NAME */
                 if ($j == 0) {
-                    var_dump($element->plaintext);
-                    var_dump($element->href);
+//                    var_dump($element->plaintext);
+//                    var_dump($element->href);
+                }
+                /* PLATEFORME */
+                if ($j == 1) {
+//                    var_dump($element->plaintext);
+//                    var_dump($element->href);
                 }
                 $j++;
             }
