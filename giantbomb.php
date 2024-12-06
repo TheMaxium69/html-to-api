@@ -47,6 +47,8 @@ class GiantBombAPI
 
         # init all vars
         $name = "";
+        $release_date = "";
+        $first_release_date = "";
 
         if (!$html) {
             $json_output['error'] = "Page could not be loaded!";
@@ -60,17 +62,46 @@ class GiantBombAPI
                 $name = trim($element->plaintext);
             }
 
+            /* REALEASE */
+            foreach ($html->find('p.wiki-descriptor') as $element) {
+                $last_release_date = trim(substr($element->plaintext, strpos($element->plaintext, 'Released') + strlen('Released')));
+                $release_date = substr($last_release_date, 0, 18);
+            }
+
+            /* FIRST_REALEASE */
+            $j = 0;
+            foreach ($html->find('div.wiki-details table tbody tr td div.wiki-item-display a') as $element) {
+                var_dump($element->plaintext);
+                var_dump($element->href);
+                if ($j == 0) {
+                    var_dump($element->plaintext);
+                    var_dump($element->href);
+                }
+                $j++;
+            }
+
+            /* FIRST_REALEASE */
+            $j = 0;
+            foreach ($html->find('div.wiki-details table tbody tr td div.wiki-item-display span') as $element) {
+                if ($j == 1) {
+                    $first_release_date = $element->plaintext;
+                }
+                $j++;
+            }
+
             # Prevent memory leak
             $html->clear();
             unset($html);
 
             # Fill-in the array
             $json_output['name'] = $name;
+            $json_output['release_date'] = $release_date;
+            $json_output['first_release_date'] = $first_release_date;
         }
 
 
         # Return JSON format
-        header('Content-Type: application/json');
+//        header('Content-Type: application/json');
         return json_encode($json_output);
     }
 }
