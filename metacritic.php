@@ -50,7 +50,7 @@ class MetacriticAPI
 
         # init all vars
         $name = "";
-        $metascritic_score = 0;
+        $metacritic_score = 0;
         $user_score = 0.0;
         $publisher = "";
         $developers = array();
@@ -74,7 +74,7 @@ class MetacriticAPI
             $j = 0;
             foreach ($html->find('div.c-productScoreInfo_scoreNumber div.c-siteReviewScore span') as $element) {
                 if ($j == 0) {
-                    $metascritic_score = trim($element->plaintext);
+                    $metacritic_score = trim($element->plaintext);
                 } else {
                     $user_score = trim($element->plaintext);
                 }
@@ -122,7 +122,7 @@ class MetacriticAPI
 
             # Fill-in the array
             $json_output['name'] = $name;
-            $json_output['metascritic_score'] = $metascritic_score;
+            $json_output['metacritic_score'] = $metacritic_score;
             $json_output['users_score'] = $user_score;
             $json_output['publishers'] = $publisher;
             $json_output['developers'] = $developers;
