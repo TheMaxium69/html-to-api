@@ -129,7 +129,7 @@ class GiantBombAPI
                         foreach ($elementSub as $oneElement) {
                             $elementName = trim($oneElement->plaintext);
                             $elementUrl = trim($oneElement->href);
-                            $detail['developer'][] = [
+                            $detail['publisher'][] = [
                                 'name' => $elementName,
                                 'url' => $elementUrl
                             ];

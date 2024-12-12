@@ -1,7 +1,7 @@
 <?php
 
 header('content-type: application/json');
-header('Access-Control-Allow-Origin: *');   
+header('Access-Control-Allow-Origin: *');
 
 require_once 'libs/simple_html_dom.php';
 
