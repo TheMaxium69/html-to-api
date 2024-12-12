@@ -53,6 +53,7 @@ class GiantBombAPI
         $release_date = "";
         $average_score = "";
         $detail = [];
+        $picture = [];
 
         if (!$html) {
             $json_output['error'] = "Page could not be loaded!";
@@ -180,6 +181,35 @@ class GiantBombAPI
 
             }
 
+            /* PICTURE BOXART */
+            foreach ($html->find('.wiki-boxart img') as $element) {
+                if (strpos($element->src, 'data:') !== 0 && $element->src != "https://www.giantbomb.com/a/bundles/phoenixsite/images/core/loose/img_broken.png" && $element->src != ""){
+                    $picture[] = $element->src;
+                }
+            }
+
+            /* PICTURE BANNER */
+            foreach ($html->find('.kubrick-strip') as $element) {
+                preg_match('/url\((.*?)\)/', $element->style, $matches);
+                if (isset($matches[1]) && !empty($matches[1])) {
+                    $picture[] = $matches[1];
+                }
+            }
+
+            /* PICTURE IN WIKI */
+            foreach ($html->find('.primary-content img') as $element) {
+                if (strpos($element->src, 'data:') !== 0 && $element->src != "https://www.giantbomb.com/a/bundles/phoenixsite/images/core/loose/img_broken.png" && $element->src != ""){
+                    $picture[] = $element->src;
+                }
+            }
+
+            /* PICTURE IN LATEST IMAGES */
+            foreach ($html->find('.gallery-box-pod figure a') as $element) {
+                if (strpos($element->href, 'data:') !== 0 && $element->href != "https://www.giantbomb.com/a/bundles/phoenixsite/images/core/loose/img_broken.png" && $element->href != ""){
+                    $picture[] = $element->href;
+                }
+            }
+
 
 
 
@@ -194,6 +224,7 @@ class GiantBombAPI
             $json_output['release_date'] = $release_date;
             $json_output['average_score'] = $average_score;
             $json_output['detail'] = $detail;
+            $json_output['picture'] = $picture;
         }
 
 
