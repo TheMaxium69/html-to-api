@@ -1,47 +1,50 @@
 <?php
 
+header('content-type: application/json');
+header('Access-Control-Allow-Origin: *');
+
 require_once 'libs/simple_html_dom.php';
 
 class MetacriticAPI
 {
     private $response_body = "";
-    private $baseUrl = "https://www.metacritic.com/game/";
+    private $baseurl = "https://www.metacritic.com/game/";
 
-    public function getMetacriticPage($game_name)
+    public function getmetacriticpage($game_name)
     {
-        $returnValue = "";
+        $returnvalue = "";
 
-        /*FORMATAGE NAME*/
+        /*formatage name*/
         $game_name = trim($game_name);
         $game_name = str_replace(' ', '-', $game_name);
         $game_name = str_replace('& ', '', $game_name);
         $game_name = strtolower($game_name);
         $game_name = preg_replace('/[^a-z\d\?!\-]/', '', $game_name);
 
-        /* URL */
-        $url = 'https://www.metacritic.com/game/super-mario-galaxy-2/'; /* FOR TEST */
-        $url = $this->baseUrl . $game_name . "/";
+        /* url */
+        $url = 'https://www.metacritic.com/game/super-mario-galaxy-2/'; /* for test */
+        $url = $this->baseurl . $game_name . "/";
 
-        /* GET PAGE WEB */
+        /* get page web */
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, curlopt_url, $url);
+        curl_setopt($ch, curlopt_returntransfer, 1);
+        curl_setopt($ch, curlopt_ssl_verifypeer, false);
+        curl_setopt($ch, curlopt_ssl_verifyhost, 0);
         $output = curl_exec($ch);
         curl_close($ch);
 
-        /* RETURN */
-        $returnValue = $output;
-        $this->response_body = $returnValue;
+        /* return */
+        $returnvalue = $output;
+        $this->response_body = $returnvalue;
     }
 
-    public function getMetacriticScores()
+    public function getmetacriticscores()
     {
-        # Get DOM by string content
+        # get dom by string content
         $html = str_get_html($this->response_body);
 
-        # Define json output array
+        # define json output array
         $json_output = array();
         $error = false;
 
@@ -56,20 +59,20 @@ class MetacriticAPI
         $genres = array();
 
         if (!$html) {
-            $json_output['error'] = "Page could not be loaded!";
+            $json_output['error'] = "page could not be loaded!";
             $error = true;
         }
 
         if (!$error) {
 
-            /* NAME */
-            foreach ($html->find('div.c-productHero_title h1') as $element) {
+            /* name */
+            foreach ($html->find('div.c-producthero_title h1') as $element) {
                 $name = trim($element->plaintext);
             }
 
-            /* NOTE */
+            /* note */
             $j = 0;
-            foreach ($html->find('div.c-productScoreInfo_scoreNumber div.c-siteReviewScore span') as $element) {
+            foreach ($html->find('div.c-productscoreinfo_scorenumber div.c-sitereviewscore span') as $element) {
                 if ($j == 0) {
                     $metascritic_score = trim($element->plaintext);
                 } else {
@@ -79,45 +82,45 @@ class MetacriticAPI
                 $j++;
             }
 
-            /* EDITEUR */
+            /* editeur */
             $j = 0;
-            foreach ($html->find('div.c-gameDetails_Distributor span') as $element) {
+            foreach ($html->find('div.c-gamedetails_distributor span') as $element) {
                 if ($j !== 0) {
                     $publisher = trim($element->plaintext);
                 }
                 $j++;
             }
 
-            /* DEVELOPPEUR */
-            foreach ($html->find('div.c-gameDetails_Developer li.c-gameDetails_listItem') as $element) {
+            /* developpeur */
+            foreach ($html->find('div.c-gamedetails_developer li.c-gamedetails_listitem') as $element) {
                 $developers[] = trim($element->plaintext);
             }
 
-           /* RELEASE DATE */
+           /* release date */
             $j=0;
-            foreach ($html->find('div.c-gameDetails_ReleaseDate span') as $element) {
+            foreach ($html->find('div.c-gamedetails_releasedate span') as $element) {
                 if ($j !== 0) {
                     $release_date = trim($element->plaintext);
                 }
                 $j++;
             }
 
-            /* PLATEFORME */
-            foreach ($html->find('div.c-gameDetails_Platforms li.c-gameDetails_listItem') as $element) {
+            /* plateforme */
+            foreach ($html->find('div.c-gamedetails_platforms li.c-gamedetails_listitem') as $element) {
                 array_push($plateforms, trim($element->plaintext));
             }
 
-            /* GENRE */
-            foreach ($html->find('ul.c-genreList li.c-genreList_item div a span') as $element) {
+            /* genre */
+            foreach ($html->find('ul.c-genrelist li.c-genrelist_item div a span') as $element) {
                 array_push($genres, trim($element->plaintext));
             }
 
 
-            # Prevent memory leak
+            # prevent memory leak
             $html->clear();
             unset($html);
 
-            # Fill-in the array
+            # fill-in the array
             $json_output['name'] = $name;
             $json_output['metascritic_score'] = $metascritic_score;
             $json_output['users_score'] = $user_score;
@@ -129,18 +132,17 @@ class MetacriticAPI
         }
 
 
-        # Return JSON format
-        header('Content-Type: application/json');
+        # return json format
         return json_encode($json_output);
     }
 }
 
 
-if (isset($_GET['game_title'])) {
+if (isset($_get['game_title'])) {
     $metacritic_api = new MetacriticAPI();
-    $metacritic_api->getMetacriticPage($_GET['game_title']);
-    echo $metacritic_api->getMetacriticScores();
+    $metacritic_api->getmetacriticpage($_get['game_title']);
+    echo $metacritic_api->getmetacriticscores();
 } else {
-    echo json_encode(array("error" => "Game title is empty"));
+    echo json_encode(array("error" => "game title is empty"));
 }
 

@@ -1,5 +1,8 @@
 <?php
 
+header('content-type: application/json');
+header('Access-Control-Allow-Origin: *');
+
 require_once 'libs/simple_html_dom.php';
 
 class GiantBombAPI
@@ -195,7 +198,6 @@ class GiantBombAPI
 
 
         # Return JSON format
-        header('Content-Type: application/json');
         return json_encode($json_output);
     }
 }
