@@ -192,7 +192,9 @@ class GiantBombAPI
             foreach ($html->find('.kubrick-strip') as $element) {
                 preg_match('/url\((.*?)\)/', $element->style, $matches);
                 if (isset($matches[1]) && !empty($matches[1])) {
-                    $picture[] = $matches[1];
+                    if ($matches[1] != "https://www.giantbomb.com/a/bundles/phoenixsite/images/core/loose/bg-default-wiki.png"){
+                        $picture[] = $matches[1];
+                    }
                 }
             }
 
