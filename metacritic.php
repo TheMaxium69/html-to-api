@@ -178,7 +178,7 @@ if (isset($_GET['game_title'])) {
 
     if (!empty($results[0])) {
         $selectedGame= $results[0];
-        
+
         if (strtotime($selectedGame['added_at']) >= strtotime('-1 month')) {
             // Code à exécuter si ça a été ajouté il y a moins d'un mois
             $json_output['name'] = $selectedGame['name'];

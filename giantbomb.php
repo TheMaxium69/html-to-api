@@ -2,6 +2,7 @@
 
 header('content-type: application/json');
 header('Access-Control-Allow-Origin: *');
+require "db.php";
 
 require_once 'libs/simple_html_dom.php';
 
@@ -42,6 +43,7 @@ class GiantBombAPI
     public function getGiantBombScores()
     {
         # Get DOM by string content
+        global $db;
         $html = str_get_html($this->response_body);
 
         # Define json output array
@@ -221,6 +223,7 @@ class GiantBombAPI
             $html->clear();
             unset($html);
 
+
             # Fill-in the array
             $json_output['name'] = $name;
             $json_output['release_date'] = $release_date;
@@ -230,6 +233,25 @@ class GiantBombAPI
         }
 
 
+        if (isset($json_output['name']) && !empty($json_output['name'])) {
+            $insertQuery = $db->prepare("INSERT INTO giantbomb (search_guid, name, release_date, average_score, detail, picture) 
+                VALUES (:search_guid, :name, :release_date, :average_score, :detail, :picture)");
+
+            $detailJson = json_encode($json_output['detail']);
+            $pictureJson = json_encode($json_output['picture']);
+
+            $insertQuery->bindParam(':search_guid', $_GET['guid']);
+            $insertQuery->bindParam(':name', $json_output['name']);
+            $insertQuery->bindParam(':release_date', $json_output['release_date']);
+            $insertQuery->bindParam(':average_score', $json_output['average_score']);
+            $insertQuery->bindParam(':detail', $detailJson);
+            $insertQuery->bindParam(':picture', $pictureJson);
+
+            $insertQuery->execute();
+        }
+
+
+
         # Return JSON format
         return json_encode($json_output);
     }
@@ -237,9 +259,45 @@ class GiantBombAPI
 
 
 if (isset($_GET['game_title']) && isset($_GET['guid'])) {
-    $giantbomb_api = new GiantBombAPI();
-    $giantbomb_api->getGiantBombPage($_GET['game_title'], $_GET['guid']);
-    echo $giantbomb_api->getGiantBombScores();
+
+    $game_guid = $_GET['guid'];
+
+    // Prepare and execute the PDO query
+    $stmt = $db->prepare("SELECT * FROM giantbomb WHERE search_guid = :game_guid");
+    $stmt->bindParam(':game_guid', $game_guid);
+    $stmt->execute();
+
+    // Fetch results as an associative array
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+    if (!empty($results[0])) {
+        $selectedGame = $results[0];
+
+        if (strtotime($selectedGame['added_at']) >= strtotime('-1 month')) {
+            // Code à exécuter si ça a été ajouté il y a moins d'un mois
+            $json_output['name'] = $selectedGame['name'];
+            $json_output['release_date'] = $selectedGame['release_date'];
+            $json_output['average_score'] = $selectedGame['average_score'];
+            $json_output['detail'] = json_decode($selectedGame['detail']);
+            $json_output['picture'] = json_decode($selectedGame['picture']);
+            echo json_encode($json_output);
+
+        } else {
+
+            $giantbomb_api = new GiantBombAPI();
+            $giantbomb_api->getGiantBombPage($_GET['game_title'], $_GET['guid']);
+            echo $giantbomb_api->getGiantBombScores();
+        }
+
+    } else {
+
+        $giantbomb_api = new GiantBombAPI();
+        $giantbomb_api->getGiantBombPage($_GET['game_title'], $_GET['guid']);
+        echo $giantbomb_api->getGiantBombScores();
+
+    }
+
 } else {
     echo json_encode(array("error" => "Game title is empty"));
 }

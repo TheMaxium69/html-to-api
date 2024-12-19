@@ -11,7 +11,7 @@ $Database = "gamenium_api";
 //PDO
 try {
     $db = new PDO("mysql:host=" . $host . ";dbname=" . $Database, $userDB, $passDB);
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOEXeption $e) {
     // Do nothing
 }
