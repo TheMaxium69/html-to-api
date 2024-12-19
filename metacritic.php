@@ -178,17 +178,27 @@ if (isset($_GET['game_title'])) {
 
     if (!empty($results[0])) {
         $selectedGame= $results[0];
+        
+        if (strtotime($selectedGame['added_at']) >= strtotime('-1 month')) {
+            // Code à exécuter si ça a été ajouté il y a moins d'un mois
+            $json_output['name'] = $selectedGame['name'];
+            $json_output['metacritic_score'] = $selectedGame['metacritic_score'];
+            $json_output['users_score'] = $selectedGame['users_score'];
+            $json_output['publishers'] = $selectedGame['publishers'];
+            $json_output['developers'] = json_decode($selectedGame['developers']);
+            $json_output['release_date'] = $selectedGame['release_date'];
+            $json_output['plateforms'] = json_decode($selectedGame['plateforms']);
+            $json_output['genres'] = json_decode($selectedGame['genres']);
 
-        $json_output['name'] = $selectedGame['name'];
-        $json_output['metacritic_score'] = $selectedGame['metacritic_score'];
-        $json_output['users_score'] = $selectedGame['users_score'];
-        $json_output['publishers'] = $selectedGame['publishers'];
-        $json_output['developers'] = json_decode($selectedGame['developers']);
-        $json_output['release_date'] = $selectedGame['release_date'];
-        $json_output['plateforms'] = json_decode($selectedGame['plateforms']);
-        $json_output['genres'] = json_decode($selectedGame['genres']);
+            echo json_encode($json_output);
 
-        echo json_encode($json_output);
+        } else {
+
+            $metacritic_api = new MetacriticAPI();
+            $metacritic_api->getMetacriticPage($game_title);
+            echo $metacritic_api->getMetacriticScores();
+
+        }
 
     } else {
 
