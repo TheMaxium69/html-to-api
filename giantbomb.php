@@ -234,7 +234,7 @@ class GiantBombAPI
 
 
         if (isset($json_output['name']) && !empty($json_output['name'])) {
-            $insertQuery = $db->prepare("INSERT INTO giantbomb (search_guid, name, release_date, average_score, detail, picture) 
+            $insertQuery = $db->prepare("INSERT INTO gamenium_giantbomb (search_guid, name, release_date, average_score, detail, picture) 
                 VALUES (:search_guid, :name, :release_date, :average_score, :detail, :picture)");
 
             $detailJson = json_encode($json_output['detail']);
@@ -263,7 +263,7 @@ if (isset($_GET['game_title']) && isset($_GET['guid'])) {
     $game_guid = $_GET['guid'];
 
     // Prepare and execute the PDO query
-    $stmt = $db->prepare("SELECT * FROM giantbomb WHERE search_guid = :game_guid");
+    $stmt = $db->prepare("SELECT * FROM gamenium_giantbomb WHERE search_guid = :game_guid");
     $stmt->bindParam(':game_guid', $game_guid);
     $stmt->execute();
 

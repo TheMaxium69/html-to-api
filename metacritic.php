@@ -136,7 +136,7 @@ class MetacriticAPI
 
 // Insert game data into the database
         if (isset($json_output['name']) && !empty($json_output['name'])) {
-            $insertQuery = $db->prepare("INSERT INTO metacritic (search_name, name, metacritic_score, users_score, publishers, developers, release_date, plateforms, genres) 
+            $insertQuery = $db->prepare("INSERT INTO gamenium_metacritic (search_name, name, metacritic_score, users_score, publishers, developers, release_date, plateforms, genres) 
                 VALUES (:search_name, :name, :metacritic_score, :users_score, :publishers, :developers, :release_date, :plateforms, :genres)");
 
             $developersJson = json_encode($json_output['developers']);
@@ -168,7 +168,7 @@ if (isset($_GET['game_title'])) {
     $game_title = $_GET['game_title'];
 
     // Prepare and execute the PDO query
-    $stmt = $db->prepare("SELECT * FROM metacritic WHERE search_name = :game_title");
+    $stmt = $db->prepare("SELECT * FROM gamenium_metacritic WHERE search_name = :game_title");
     $stmt->bindParam(':game_title', $game_title, PDO::PARAM_STR);
     $stmt->execute();
 
